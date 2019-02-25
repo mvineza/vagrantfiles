@@ -4,6 +4,8 @@
   become: yes
   vars:
     docker_config: /etc/docker/daemon.json
+    admin_kubeconfig_file: /etc/kubernetes/admin.conf
+    kubeconfig_path: /root/.kube
   tasks:
 
   - block:
@@ -128,24 +130,69 @@
     - name: Set master hostname
       set_fact:
         master_hostname: "{{ (groups['all'] | sort())[0] }}"
+      run_once: yes
 
     - name: Set master ip
       set_fact:
         master_ip: "{{ hostvars[(groups['all'] | sort())[0]]['ansible_eth1']['ipv4']['address'] }}"
+      run_once: yes
+
+    - name: Disable swap
+      shell: swapoff /swapfile
+      ignore_errors: yes
+
+    - name: Remove swapfile from /etc/fstab
+      lineinfile:
+        path: /etc/fstab
+        regexp: 'swap'
+        state: absent
+
+    - name: Check if master has been setup
+      shell: ls -l {{ admin_kubeconfig_file }}
+      delegate_to: "{{ master_hostname }}"
+      run_once: yes
+      changed_when: false
+      register: admin_kubeconfig
 
     - name: Create master node
       shell: kubeadm init --pod-network-cidr=192.168.0.0/16 apiserver-advertise-address={{ master_ip }}
       register: kubeadm_init_logs
       delegate_to: "{{ master_hostname }}"
+      run_once: yes
+      register: kubeadm_init_logs
+      when: admin_kubeconfig.rc != 0
+
+    - name: Get cluster kubeconfig
+      fetch:
+        src: "{{ admin_kubeconfig_file }}"
+        dest: /tmp/
+        flat: yes
+      delegate_to: "{{ master_hostname }}"
+      run_once: yes
+
+    - name: Create {{ kubeconfig_path }}
+      file:
+        path: "{{ kubeconfig_path }}"
+        state: directory
+
+    - name: Distribute cluster kubeconfig to other nodes
+      copy:
+        src: /tmp/{{ admin_kubeconfig_file | basename() }}
+        dest: "{{ kubeconfig_path }}/config"
 
     - name: Install pod network
       shell: "{{ item }}"
       with_items:
       - kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
       - kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
+      delegate_to: "{{ master_hostname }}"
+      run_once: yes
+      timeout: 60
+      when: admin_kubeconfig.rc == 0
 
     - name: Get join command
-      shell: echo pass
+      debug:
+        msg: "{{ kubeadm_init_logs }}"
 
     - name: Join nodes to cluster
       shell: echo pass
