@@ -62,6 +62,13 @@
         create: yes
       notify: Restart docker
 
+    - name: Cleanup docker config
+      lineinfile:
+        path: "{{ docker_config }}"
+        regexp: '^#'
+        state: absent
+      notify: Restart docker
+
     tags: setup_docker
 
   - block:
@@ -101,17 +108,17 @@
         state: started
         enabled: yes
 
+    - name: Load needed module(s)
+      modprobe:
+        name: br_netfilter
+
     - name: Prevent packets from bypassing iptables
       sysctl:
         name: "{{ item }}"
         value: 1
       with_items:
-      # - net.bridge.bridge-nf-call-ip6tables
+      - net.bridge.bridge-nf-call-ip6tables
       - net.bridge.bridge-nf-call-iptables
-
-    - name: Load needed module(s)
-      modprobe:
-        name: br_netfilter
 
     tags: setup_kubeadm
 
