@@ -5,6 +5,7 @@
   vars:
     docker_config: /etc/docker/daemon.json
     admin_kubeconfig_file: /etc/kubernetes/admin.conf
+    kubelet_config: /etc/kubernetes/kubelet.conf
     kubeconfig_path: /root/.kube
   tasks:
 
@@ -71,6 +72,12 @@
         regexp: '^#'
         state: absent
       notify: Restart docker
+
+    - name: Ensure docker is enabled
+      systemd:
+        name: docker
+        state: started
+        enabled: yes 
 
     tags: setup_docker
 
@@ -153,13 +160,20 @@
       run_once: yes
       changed_when: false
       register: admin_kubeconfig
+      ignore_errors: yes
+
+    - name: Check if workers has been setup
+      shell: ls -l {{ kubelet_config }}
+      changed_when: false
+      register: worker_kubelet
+      ignore_errors: yes
+      when: inventory_hostname != master_hostname
 
     - name: Create master node
-      shell: kubeadm init --pod-network-cidr=192.168.0.0/16 apiserver-advertise-address={{ master_ip }}
+      shell: kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address={{ master_ip }}
       register: kubeadm_init_logs
       delegate_to: "{{ master_hostname }}"
       run_once: yes
-      register: kubeadm_init_logs
       when: admin_kubeconfig.rc != 0
 
     - name: Get cluster kubeconfig
@@ -187,15 +201,16 @@
       - kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
       delegate_to: "{{ master_hostname }}"
       run_once: yes
-      timeout: 60
-      when: admin_kubeconfig.rc == 0
+      when: admin_kubeconfig.rc != 0
 
     - name: Get join command
-      debug:
-        msg: "{{ kubeadm_init_logs }}"
+      set_fact:
+        kubeadm_join: "{{ kubeadm_init_logs.stdout_lines[-1:][0]  }}"
+      ignore_errors: yes
 
     - name: Join nodes to cluster
-      shell: echo pass
+      shell: "{{ kubeadm_join }}"
+      when: inventory_hostname != master_hostname and worker_kubelet.rc != 0
 
     tags: setup_kubernetes
 
