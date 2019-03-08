@@ -1,0 +1,222 @@
+# Tested on `CentOS Linux release 7.6.1810 (Core)` using Ansible 2.7.5. Don't
+# run this on live system as this will force restart docker.
+- hosts: all
+  become: yes
+  vars:
+    docker_config: /etc/docker/daemon.json
+    admin_kubeconfig_file: /etc/kubernetes/admin.conf
+    kubelet_config: /etc/kubernetes/kubelet.conf
+    kubeconfig_path: /root/.kube
+  tasks:
+
+  - block:
+
+    - name: Install RPMs
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+      - yum-utils
+      - device-mapper-persistent-data
+      - lvm2
+
+    - name: Add docker repo
+      yum_repository:
+        name: docker-ce
+        description: Docer CE (Stable)
+        baseurl: https://download.docker.com/linux/centos/7/$basearch/stable
+        enabled: yes
+        gpgcheck: yes
+        gpgkey: https://download.docker.com/linux/centos/gpg
+
+    - name: Install docker
+      yum:
+        name: docker-ce-18.06.2.ce
+        state: present
+
+    - name: Create needed directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+      - /etc/docker
+      - /etc/systemd/system/docker.service.d
+      register: required_dirs
+
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes
+      when: required_dirs.changed
+
+    - name: Create docker config
+      blockinfile:
+        path: "{{ docker_config }}"
+        block: |
+          {
+            "exec-opts": ["native.cgroupdriver=systemd"],
+            "log-driver": "json-file",
+            "log-opts": {
+              "max-size": "100m"
+            },
+            "storage-driver": "overlay2",
+            "storage-opts": [
+              "overlay2.override_kernel_check=true"
+            ]
+          }
+        create: yes
+      notify: Restart docker
+
+    - name: Cleanup docker config
+      lineinfile:
+        path: "{{ docker_config }}"
+        regexp: '^#'
+        state: absent
+      notify: Restart docker
+
+    - name: Ensure docker is enabled
+      systemd:
+        name: docker
+        state: started
+        enabled: yes 
+
+    tags: setup_docker
+
+  - block:
+
+    - name: Disable firewalld
+      systemd:
+        name: firewalld
+        state: stopped
+        enabled: no
+
+    - name: Add kubernetes repo
+      yum_repository:
+        name: kubernetes
+        description: Kubernetes Repo
+        baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+        gpgcheck: yes
+        repo_gpgcheck: yes
+        gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+        #exclude: kube*
+
+    - name: Disable selinux
+      selinux:
+        state: disabled
+
+    - name: Install kubernetes packages
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+      - kubelet
+      - kubeadm
+      - kubectl
+
+    - name: Enabled kubelet
+      systemd:
+        name: kubelet
+        state: started
+        enabled: yes
+
+    - name: Load needed module(s)
+      modprobe:
+        name: br_netfilter
+
+    - name: Prevent packets from bypassing iptables
+      sysctl:
+        name: "{{ item }}"
+        value: 1
+      with_items:
+      - net.bridge.bridge-nf-call-ip6tables
+      - net.bridge.bridge-nf-call-iptables
+
+    tags: setup_kubeadm
+
+  - block:
+
+    - name: Set master hostname
+      set_fact:
+        master_hostname: "{{ (groups['all'] | sort())[0] }}"
+      run_once: yes
+
+    - name: Set master ip
+      set_fact:
+        master_ip: "{{ hostvars[(groups['all'] | sort())[0]]['ansible_eth1']['ipv4']['address'] }}"
+      run_once: yes
+
+    - name: Disable swap
+      shell: swapoff /swapfile
+      ignore_errors: yes
+
+    - name: Remove swapfile from /etc/fstab
+      lineinfile:
+        path: /etc/fstab
+        regexp: 'swap'
+        state: absent
+
+    - name: Check if master has been setup
+      shell: ls -l {{ admin_kubeconfig_file }}
+      delegate_to: "{{ master_hostname }}"
+      run_once: yes
+      changed_when: false
+      register: admin_kubeconfig
+      ignore_errors: yes
+
+    - name: Check if workers has been setup
+      shell: ls -l {{ kubelet_config }}
+      changed_when: false
+      register: worker_kubelet
+      ignore_errors: yes
+      when: inventory_hostname != master_hostname
+
+    - name: Create master node
+      shell: kubeadm init --pod-network-cidr=192.168.0.0/16 --apiserver-advertise-address={{ master_ip }}
+      register: kubeadm_init_logs
+      delegate_to: "{{ master_hostname }}"
+      run_once: yes
+      when: admin_kubeconfig.rc != 0
+
+    - name: Get cluster kubeconfig
+      fetch:
+        src: "{{ admin_kubeconfig_file }}"
+        dest: /tmp/
+        flat: yes
+      delegate_to: "{{ master_hostname }}"
+      run_once: yes
+
+    - name: Create {{ kubeconfig_path }}
+      file:
+        path: "{{ kubeconfig_path }}"
+        state: directory
+
+    - name: Distribute cluster kubeconfig to other nodes
+      copy:
+        src: /tmp/{{ admin_kubeconfig_file | basename() }}
+        dest: "{{ kubeconfig_path }}/config"
+
+    - name: Install pod network
+      shell: "{{ item }}"
+      with_items:
+      - kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
+      - kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
+      delegate_to: "{{ master_hostname }}"
+      run_once: yes
+      when: admin_kubeconfig.rc != 0
+
+    - name: Get join command
+      set_fact:
+        kubeadm_join: "{{ kubeadm_init_logs.stdout_lines[-1:][0]  }}"
+      ignore_errors: yes
+
+    - name: Join nodes to cluster
+      shell: "{{ kubeadm_join }}"
+      when: inventory_hostname != master_hostname and worker_kubelet.rc != 0
+
+    tags: setup_kubernetes
+
+  handlers:
+
+  - name: Restart docker
+    systemd:
+      name: docker
+      state: restarted
