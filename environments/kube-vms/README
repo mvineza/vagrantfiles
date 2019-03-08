@@ -2,4 +2,4 @@
 ./setup.sh
 
 # destroying the cluster
-vagrant desotry -f
+vagrant destroy -f
