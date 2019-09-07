@@ -4,8 +4,7 @@
 #   For generic purposes.
 
 Vagrant.configure("2") do |config|
-  N = ENV['VM_COUNT']
-  # N = 2
+  N = ENV['VM_COUNT'].to_i
   home = ENV['HOME']
   virtual_box_path = "#{home}/VirtualBox VMs"
   (1..N).each do |machine_id|
