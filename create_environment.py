@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 
 import os
+import re
 from jinja2 import Template, Environment, FileSystemLoader
 from argparse import ArgumentParser
 
-work_dir='workdir'
-template_dir='templates'
-template_file='Vagrantfile.j2'
-dump_file='Vagrantfile'
+work_dir = 'workdir'
+template_dir = 'templates'
+template_file = 'Vagrantfile.j2'
+dump_file = 'Vagrantfile'
+subnet = '192.168.50'
+host_file = '/etc/hosts'
 
 parser = ArgumentParser(description='Setups environment using Vagrant and Ansible')
 parser.add_argument('-c', dest='count', default='1', help='number of VMs')
 args = parser.parse_args()
 
-vm_count = args.count
+count = args.count
 
 try:
     os.mkdir(work_dir)
@@ -21,6 +24,21 @@ except FileExistsError:
     pass
 
 
-e = Environment(loader=FileSystemLoader(template_dir))
-t = e.get_template(template_file)
-t.stream(count=vm_count).dump(os.path.join(work_dir, dump_file))
+def get_last_ip():
+    ip_list = []
+    with open(host_file) as f:
+        for line in f.readlines():
+            ip_list.extend(re.findall(subnet + '.[0-9]+', line.strip()))
+    last_ip = sorted(ip_list)[-1:][0]
+    last_host = last_ip.split('.')[-1:][0]
+    return last_host
+
+
+def render_template():
+    last_host = get_last_ip()
+    e = Environment(loader=FileSystemLoader(template_dir))
+    t = e.get_template(template_file)
+    t.stream(count=count, subnet=subnet, last_host=last_host).dump(os.path.join(work_dir, dump_file))
+
+
+render_template()
