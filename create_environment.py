@@ -67,6 +67,11 @@ def bootstrap_environment():
 
 def check_requirements():
     vagrant_cmd = get_vagrant_cmd()
+    vagrant_host_updater = 'vagrant-hostsupdater'
+    plugins = os.popen("{} plugin list".format(vagrant_cmd)).read()
+    if not re.search(vagrant_host_updater, plugins):
+        print('{} plugin not found.'.format(vagrant_host_updater))
+        sys.exit(1)
 
 
 check_requirements()
