@@ -2,6 +2,7 @@
 
 import os
 import re
+import sys
 from jinja2 import Environment, FileSystemLoader
 from argparse import ArgumentParser
 
@@ -40,7 +41,8 @@ def render_template():
     try:
         os.makedirs(work_dir)
     except FileExistsError:
-        pass
+        print('{} already exists'.format(work_dir))
+        sys.exit(1)
     last_host = get_last_ip()
     e = Environment(loader=FileSystemLoader(template_dir))
     t = e.get_template(template_file)
