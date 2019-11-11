@@ -5,7 +5,7 @@ import re
 from jinja2 import Environment, FileSystemLoader
 from argparse import ArgumentParser
 
-work_dir = 'workdir'
+base_env_dir = 'environments'
 template_dir = 'templates'
 template_file = 'Vagrantfile.j2'
 dump_file = 'Vagrantfile'
@@ -14,14 +14,12 @@ host_file = '/etc/hosts'
 
 parser = ArgumentParser(description='Setups environment using Vagrant/Ansible')
 parser.add_argument('-c', dest='count', default='1', help='number of VMs')
+parser.add_argument('-e', dest='env', required=True,
+                    help='name for your environment')
 args = parser.parse_args()
 
 count = args.count
-
-try:
-    os.mkdir(work_dir)
-except FileExistsError:
-    pass
+env = args.env
 
 
 def get_last_ip():
@@ -38,6 +36,11 @@ def get_last_ip():
 
 
 def render_template():
+    work_dir = os.path.join(base_env_dir, env)
+    try:
+        os.makedirs(work_dir)
+    except FileExistsError:
+        pass
     last_host = get_last_ip()
     e = Environment(loader=FileSystemLoader(template_dir))
     t = e.get_template(template_file)
