@@ -23,6 +23,17 @@ count = args.count
 env = args.env
 
 
+def get_vagrant_cmd():
+    cmd = 'vagrant'
+    cmd_path = os.popen("which {}".format(cmd)).read().strip()
+    if cmd_path:
+        return cmd_path
+    else:
+        print('Unable to find {} command'.format(cmd))
+        sys.exit(1)
+
+
+
 def get_last_ip():
     ip_list = []
     with open(host_file) as f:
@@ -54,5 +65,10 @@ def bootstrap_environment():
     pass
 
 
+def check_requirements():
+    vagrant_cmd = get_vagrant_cmd()
+
+
+check_requirements()
 render_template()
 bootstrap_environment()
