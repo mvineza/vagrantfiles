@@ -5,6 +5,13 @@
     inventory_file: inventory
   tasks:
 
+  - name: Install dependencies
+    yum:
+      name: "{{ item }}"
+      state: present
+    loop:
+    - libselinux-python
+
   - name: Update /etc/hosts on all nodes
     lineinfile:
       path: /etc/hosts
