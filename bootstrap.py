@@ -16,6 +16,9 @@ playbooks_dir = 'playbooks'
 
 parser = ArgumentParser(description='Setups environment using Vagrant/Ansible',
                         formatter_class=ArgumentDefaultsHelpFormatter)
+group = parser.add_mutually_exclusive_group()
+group.add_argument('--create', action='store_true', help='create env')
+group.add_argument('--destroy', action='store_true', help='destroy env')
 parser.add_argument('-n', dest='num', default='1', help='number of VMs')
 parser.add_argument('-s', dest='net', default='192.168.50', help='VM subnet')
 parser.add_argument('-e', dest='env', required=True,
@@ -25,6 +28,8 @@ args = parser.parse_args()
 count = args.num
 env = args.env
 subnet = args.net
+create = args.create
+destroy = args.destroy
 
 
 def get_vagrant_cmd():
@@ -73,6 +78,10 @@ def render_template():
         os.path.join(work_dir, dump_file))
 
 
+def destroy_environment():
+    pass
+
+
 def bootstrap_environment():
     os.chdir(work_dir)
     bootstrap = subprocess.call([vagrant_cmd, "up"])
@@ -94,4 +103,7 @@ def check_requirements():
 check_requirements()
 render_template()
 setup_playbooks()
-bootstrap_environment()
+if create:
+    bootstrap_environment()
+if destroy:
+    destroy_environment()
