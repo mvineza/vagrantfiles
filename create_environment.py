@@ -48,7 +48,16 @@ def get_last_ip():
     return last_host
 
 
+def link_playbooks():
+    for file in os.listdir(playbooks_dir):
+        orig_file = os.path.abspath(os.path.join(playbooks_dir, file))
+        link_file = os.path.abspath(os.path.join(work_dir, file))
+        if os.path.isfile(orig_file):
+            os.symlink(orig_file, link_file)
+
+
 def render_template():
+    global work_dir
     work_dir = os.path.join(base_env_dir, env)
     try:
         os.makedirs(work_dir)
@@ -82,4 +91,5 @@ def check_requirements():
 
 check_requirements()
 render_template()
+link_playbooks()
 bootstrap_environment()
