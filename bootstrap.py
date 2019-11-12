@@ -6,6 +6,7 @@ import sys
 import subprocess
 from jinja2 import Environment, FileSystemLoader
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from shutil import rmtree
 
 base_env_dir = 'environments'
 template_dir = 'templates'
@@ -30,6 +31,7 @@ env = args.env
 subnet = args.net
 create = args.create
 destroy = args.destroy
+work_dir = os.path.join(base_env_dir, env)
 
 
 def get_vagrant_cmd():
@@ -64,8 +66,6 @@ def setup_playbooks():
 
 
 def render_template():
-    global work_dir
-    work_dir = os.path.join(base_env_dir, env)
     try:
         os.makedirs(work_dir)
     except FileExistsError:
@@ -79,7 +79,14 @@ def render_template():
 
 
 def destroy_environment():
-    pass
+    os.chdir(work_dir)
+    destroy_env = subprocess.call([vagrant_cmd, "destroy", "-f"])
+    if destroy_env != 0:
+        print('Erorr bootstrapping environment')
+        sys.exit(1)
+    else:
+        os.chdir(os.pardir)
+        rmtree(env)
 
 
 def create_environment():
@@ -101,9 +108,9 @@ def check_requirements():
 
 
 check_requirements()
-render_template()
-setup_playbooks()
 if create:
+    render_template()
+    setup_playbooks()
     create_environment()
 if destroy:
     destroy_environment()
