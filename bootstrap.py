@@ -84,8 +84,8 @@ def destroy_environment():
 
 def create_environment():
     os.chdir(work_dir)
-    bootstrap = subprocess.call([vagrant_cmd, "up"])
-    if bootstrap != 0:
+    create_env = subprocess.call([vagrant_cmd, "up"])
+    if create_env != 0:
         print('Erorr bootstrapping environment')
         sys.exit(1)
 
