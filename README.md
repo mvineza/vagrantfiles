@@ -1,31 +1,31 @@
-## My personal Vagrant environments
+## Introduction
 
-Feel free to add or update.
+This repository contains a python script that uses Vagrant and Ansible to
+bootstrap an environment. It relies on the host's /etc/hosts file to
+determine what is the last VM created. Once determined, it will use the next
+available IP to create any succeeding VMs. The /etc/hosts is updated
+accordingly for every vm created by using the `vagrant-hostsupdater` plugin.
 
-## Quick Demo
+## Tutorials
 
-[![asciicast](https://asciinema.org/a/yvo8siITBYRy1R4OfjUcQOwNn.svg)](https://asciinema.org/a/yvo8siITBYRy1R4OfjUcQOwNn)
+Creates Vagrantfile but don't bootsrap environment (default)
+```
+./bootstrap.py -e sample_environment
+```
 
-## Detailed Tutorial
+Creates Vagrantfile and bootsrap environment
+```
+./bootstrap.py -e sample_environment --create
+```
 
-1. Ensure ansible and vagrant are installed.
+## Pre-requisites
 
-2. Go to target environment. Some of the environments might be still in
-   progress (no provisioner, Vagrantfile don't have enough details, etc.) so
-   pick another one.
+Vagrant + vagrant-hostsupdater plugin
+Ansible
+Virtualbox
 
-   ```
-   cd environments/jenkins
-   ```
+## Setup tested
 
-3. Open `Vagrantfile` and update number of nodes by editing `N` if you want.
-   Else, you can just leave the default value.
-
-4. Bootstrap environment. This will bring up "N" VMs and run ansible provisioner
-   at the end. The provisioner creates a user on the vagrant machine(s) with
-   full sudo access and can do paswordless SSH to the machines.. The username
-   that will be created is the same username who ran this command below.
-
-   ```
-   vagrant up
-   ```
+Host OS: MacOS, Ubuntu, Centos, Fedora
+Vagrant: TBD
+Ansible: TBD
