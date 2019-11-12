@@ -11,18 +11,19 @@ base_env_dir = 'environments'
 template_dir = 'templates'
 template_file = 'Vagrantfile.j2'
 dump_file = 'Vagrantfile'
-subnet = '192.168.50'
 host_file = '/etc/hosts'
 playbooks_dir = 'playbooks'
 
 parser = ArgumentParser(description='Setups environment using Vagrant/Ansible')
 parser.add_argument('-c', dest='count', default='1', help='number of VMs')
+parser.add_argument('-s', dest='net', default='192.168.50', help='VM subnet')
 parser.add_argument('-e', dest='env', required=True,
                     help='name for your environment')
 args = parser.parse_args()
 
 count = args.count
 env = args.env
+subnet = args.net
 
 
 def get_vagrant_cmd():
