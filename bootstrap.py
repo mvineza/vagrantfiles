@@ -79,7 +79,11 @@ def render_template():
 
 
 def destroy_environment():
-    os.chdir(work_dir)
+    try:
+        os.chdir(work_dir)
+    except FileNotFoundError:
+        print('{} doesn\'t exist'.format(work_dir))
+        sys.exit(1)
     destroy_env = subprocess.call([vagrant_cmd, "destroy", "-f"])
     if destroy_env != 0:
         print('Erorr bootstrapping environment')
