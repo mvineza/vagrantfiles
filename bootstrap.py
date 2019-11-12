@@ -5,7 +5,7 @@ import re
 import sys
 import subprocess
 from jinja2 import Environment, FileSystemLoader
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
 base_env_dir = 'environments'
 template_dir = 'templates'
@@ -14,7 +14,8 @@ dump_file = 'Vagrantfile'
 host_file = '/etc/hosts'
 playbooks_dir = 'playbooks'
 
-parser = ArgumentParser(description='Setups environment using Vagrant/Ansible')
+parser = ArgumentParser(description='Setups environment using Vagrant/Ansible',
+                        formatter_class=ArgumentDefaultsHelpFormatter)
 parser.add_argument('-n', dest='num', default='1', help='number of VMs')
 parser.add_argument('-s', dest='net', default='192.168.50', help='VM subnet')
 parser.add_argument('-e', dest='env', required=True,
