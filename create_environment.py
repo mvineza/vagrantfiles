@@ -3,6 +3,7 @@
 import os
 import re
 import sys
+import subprocess
 from jinja2 import Environment, FileSystemLoader
 from argparse import ArgumentParser
 
@@ -12,6 +13,7 @@ template_file = 'Vagrantfile.j2'
 dump_file = 'Vagrantfile'
 subnet = '192.168.50'
 host_file = '/etc/hosts'
+playbooks_dir = 'playbooks'
 
 parser = ArgumentParser(description='Setups environment using Vagrant/Ansible')
 parser.add_argument('-c', dest='count', default='1', help='number of VMs')
@@ -31,7 +33,6 @@ def get_vagrant_cmd():
     else:
         print('Unable to find {} command'.format(cmd))
         sys.exit(1)
-
 
 
 def get_last_ip():
@@ -62,10 +63,15 @@ def render_template():
 
 
 def bootstrap_environment():
-    pass
+    os.chdir(work_dir)
+    bootstrap = subprocess.call([vagrant_cmd, "up"])
+    if bootstrap != 0:
+        print('Erorr bootstrapping environment')
+        sys.exit(1)
 
 
 def check_requirements():
+    global vagrant_cmd
     vagrant_cmd = get_vagrant_cmd()
     vagrant_host_updater = 'vagrant-hostsupdater'
     plugins = os.popen("{} plugin list".format(vagrant_cmd)).read()
