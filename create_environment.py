@@ -48,7 +48,7 @@ def get_last_ip():
     return last_host
 
 
-def link_playbooks():
+def setup_playbooks():
     for file in os.listdir(playbooks_dir):
         orig_file = os.path.abspath(os.path.join(playbooks_dir, file))
         link_file = os.path.abspath(os.path.join(work_dir, file))
@@ -91,5 +91,5 @@ def check_requirements():
 
 check_requirements()
 render_template()
-link_playbooks()
+setup_playbooks()
 bootstrap_environment()
