@@ -82,7 +82,7 @@ def destroy_environment():
     pass
 
 
-def bootstrap_environment():
+def create_environment():
     os.chdir(work_dir)
     bootstrap = subprocess.call([vagrant_cmd, "up"])
     if bootstrap != 0:
@@ -104,6 +104,6 @@ check_requirements()
 render_template()
 setup_playbooks()
 if create:
-    bootstrap_environment()
+    create_environment()
 if destroy:
     destroy_environment()
