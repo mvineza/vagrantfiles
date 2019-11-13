@@ -8,7 +8,10 @@ Vagrant.configure("2") do |config|
     hostname = "vm#{ {{ last_host }}+machine_id }"
     config.vm.define "#{hostname}" do |machine|
       machine.vm.hostname = "#{hostname}"
-      machine.vm.box = "centos/7"
+      machine.vm.box = "{{ box_type }}"
+      {% if box_version != 'latest' %}
+      config.vm.box_version = "{{ box_version }}"
+      {% endif %}
       machine.vm.network "private_network", ip: "{{ subnet }}.#{ {{ last_host }}+machine_id }"
       machine.vm.provider "virtualbox" do |vb|
         vb.name = "#{hostname}"

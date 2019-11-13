@@ -22,6 +22,8 @@ group.add_argument('--create', action='store_true', help='create env')
 group.add_argument('--destroy', action='store_true', help='destroy env')
 parser.add_argument('-n', dest='num', default='1', help='number of VMs')
 parser.add_argument('-s', dest='net', default='192.168.50', help='VM subnet')
+parser.add_argument('-b', dest='box', default='centos/7', help='vagrant box')
+parser.add_argument('-v', dest='ver', default='latest', help='box version')
 parser.add_argument('-e', dest='env', required=True,
                     help='name for your environment')
 args = parser.parse_args()
@@ -31,6 +33,8 @@ env = args.env
 subnet = args.net
 create = args.create
 destroy = args.destroy
+box_type = args.box
+box_version = args.ver
 work_dir = os.path.join(base_env_dir, env)
 
 
@@ -72,10 +76,12 @@ def render_template():
         print('{} already exists'.format(work_dir))
         sys.exit(1)
     last_host = get_last_ip()
-    e = Environment(loader=FileSystemLoader(template_dir))
+    e = Environment(loader=FileSystemLoader(template_dir),
+                    trim_blocks=True, lstrip_blocks=True)
     t = e.get_template(template_file)
-    t.stream(count=count, subnet=subnet, last_host=last_host).dump(
-        os.path.join(work_dir, dump_file))
+    t.stream(count=count, subnet=subnet, last_host=last_host,
+             box_type=box_type, box_version=box_version).dump(
+                 os.path.join(work_dir, dump_file))
 
 
 def destroy_environment():
@@ -97,7 +103,7 @@ def create_environment():
     os.chdir(work_dir)
     create_env = subprocess.call([vagrant_cmd, "up"])
     if create_env != 0:
-        print('Erorr bootstrapping environment')
+        print('Error bootstrapping environment')
         sys.exit(1)
 
 
