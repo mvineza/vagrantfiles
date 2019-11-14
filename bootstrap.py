@@ -63,6 +63,7 @@ def get_last_ip():
 
 
 def setup_playbooks():
+    os.chdir(script_path)
     for file in os.listdir(playbooks_dir):
         orig_file = os.path.abspath(os.path.join(playbooks_dir, file))
         link_file = os.path.abspath(os.path.join(work_dir, file))
