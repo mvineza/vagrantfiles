@@ -14,7 +14,7 @@ template_file = 'Vagrantfile.j2'
 dump_file = 'Vagrantfile'
 host_file = '/etc/hosts'
 playbooks_dir = 'playbooks'
-script_path = os.path.dirname(os.path.abspath(__file__))
+root_path = os.path.dirname(os.path.abspath(__file__))
 
 parser = ArgumentParser(description='Setups environment using Vagrant/Ansible',
                         formatter_class=ArgumentDefaultsHelpFormatter)
@@ -66,7 +66,7 @@ def get_last_ip():
 
 
 def setup_playbooks():
-    os.chdir(script_path)
+    os.chdir(root_path)
     link_src = os.path.abspath(playbooks_dir)
     link_dst = os.path.abspath(os.path.join(work_dir, playbooks_dir))
     os.symlink(link_src, link_dst)
@@ -88,7 +88,7 @@ def render_template():
 
 
 def destroy_environment():
-    os.chdir(script_path)
+    os.chdir(root_path)
     try:
         os.chdir(work_dir)
     except FileNotFoundError:
