@@ -24,6 +24,11 @@ Creates Vagrantfile and bootsrap environment
 ./bootstrap.py -e sample_environment --create
 ```
 
+Quick look on existing environments
+```
+ls environments
+```
+
 ## Pre-requisites
 
 Vagrant + vagrant-hostsupdater plugin
