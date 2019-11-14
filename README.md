@@ -38,5 +38,5 @@ Virtualbox
 ## Setup tested
 
 Host OS: MacOS, Ubuntu, Centos, Fedora
-Vagrant: TBD
-Ansible: TBD
+Vagrant: 2.2.5
+Ansible: 2.9.0
