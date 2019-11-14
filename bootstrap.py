@@ -67,11 +67,9 @@ def get_last_ip():
 
 def setup_playbooks():
     os.chdir(script_path)
-    for file in os.listdir(playbooks_dir):
-        orig_file = os.path.abspath(os.path.join(playbooks_dir, file))
-        link_file = os.path.abspath(os.path.join(work_dir, file))
-        if os.path.isfile(orig_file):
-            os.symlink(orig_file, link_file)
+    link_src = os.path.abspath(playbooks_dir)
+    link_dst = os.path.abspath(os.path.join(work_dir, playbooks_dir))
+    os.symlink(link_src, link_dst)
 
 
 def render_template():
