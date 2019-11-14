@@ -27,6 +27,8 @@ parser.add_argument('-b', dest='box', default='centos/7', help='vagrant box')
 parser.add_argument('-v', dest='ver', default='latest', help='box version')
 parser.add_argument('-e', dest='env', required=True,
                     help='name for your environment')
+parser.add_argument('--render', action='store_true',
+                    help='creates Vagrantfile only')
 args = parser.parse_args()
 
 count = args.num
@@ -36,6 +38,7 @@ create = args.create
 destroy = args.destroy
 box_type = args.box
 box_version = args.ver
+render = args.render
 work_dir = os.path.join(base_env_dir, env)
 
 
@@ -104,11 +107,15 @@ def destroy_environment():
 
 def create_environment():
     os.chdir(work_dir)
-    create_env = subprocess.call([vagrant_cmd, "up"])
-    if create_env != 0:
-        print('Error bootstrapping environment')
-        destroy_environment()
+    if render:
+        print('{}/Vagrantfile created'.format(work_dir))
         sys.exit(1)
+    else:
+        create_env = subprocess.call([vagrant_cmd, "up"])
+        if create_env != 0:
+            print('Error bootstrapping environment')
+            destroy_environment()
+            sys.exit(1)
 
 
 def check_requirements():
