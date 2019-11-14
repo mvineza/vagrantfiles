@@ -13,7 +13,7 @@ template_dir = 'templates'
 template_file = 'Vagrantfile.j2'
 dump_file = 'Vagrantfile'
 host_file = '/etc/hosts'
-playbooks_dir = 'playbooks'
+playbooks_dir = 'common_playbooks'
 root_path = os.path.dirname(os.path.abspath(__file__))
 
 parser = ArgumentParser(description='Setups environment using Vagrant/Ansible',
