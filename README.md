@@ -47,7 +47,7 @@ Deletes environment:
 ./bootstrap.py -e svn_cluster --destroy
 ```
 
-Creates 3 VMs:
+Creates a 3-node environment:
 ```
 ./bootstrap.py -e redis_ha_setup -n 3 --create
 ```
