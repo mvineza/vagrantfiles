@@ -6,6 +6,33 @@ determine what is the last VM created. Once determined, it will use the next
 available IP to create any succeeding VMs. The /etc/hosts is updated
 accordingly for every vm created by using the `vagrant-hostsupdater` plugin.
 
+## Quickstart
+
+Creates Vagrantfile and bootstrap environment:
+```
+./bootstrap.py -e nginx --create
+```
+
+Deletes environment:
+```
+./bootstrap.py -e svn_cluster --destroy
+```
+
+Creates a 3-node environment:
+```
+./bootstrap.py -e redis_ha_setup -n 3 --create
+```
+
+Creates Vagrantfile but don't bootstrap environment:
+```
+./bootstrap.py -e jenkins --create --render
+```
+
+Quick look on existing environments
+```
+ls environments
+```
+
 ## Bootstrapping
 
 Each environment will be created under `environment/` directory and a common
@@ -40,33 +67,6 @@ easy identification.
 After creating the VM(s), ansible provisioner will run to copy the host's user
 SSH public key to the VM(s). This alllows passwordless SSH making ansible
 connections easy.
-
-## Tutorials
-
-Creates Vagrantfile and bootstrap environment:
-```
-./bootstrap.py -e nginx --create
-```
-
-Deletes environment:
-```
-./bootstrap.py -e svn_cluster --destroy
-```
-
-Creates a 3-node environment:
-```
-./bootstrap.py -e redis_ha_setup -n 3 --create
-```
-
-Creates Vagrantfile but don't bootstrap environment:
-```
-./bootstrap.py -e jenkins --create --render
-```
-
-Quick look on existing environments
-```
-ls environments
-```
 
 ## Pre-requisites
 
