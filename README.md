@@ -78,9 +78,15 @@ Virtualbox
 
 ## Setup tested
 
+Versions on the host:
 ```
-Host OS: MacOS, Ubuntu, Centos, Fedora
+OS: MacOS, Ubuntu, Centos, Fedora
 Vagrant: 2.2.5
 Ansible: 2.9.0
-Guest OS: TBD
+Python: 3.7.4
+```
+
+Versions on the VMs:
+```
+TBD
 ```
