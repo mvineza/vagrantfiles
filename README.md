@@ -6,6 +6,17 @@ determine what is the last VM created. Once determined, it will use the next
 available IP to create any succeeding VMs. The /etc/hosts is updated
 accordingly for every vm created by using the `vagrant-hostsupdater` plugin.
 
+## Bootstrapping
+
+Each environment will be created under `environment/` directory and a common
+inventory file will be created under `common_playbooks/`. That inventory file
+will contain the VMs you created. The group name of the VMs will be the same
+as the environment name.
+
+Since environments and common inventory varies in each user, both are added to
+.gitignore. This makes the repo clean by avoiding changes that are not related
+to the code.
+
 ## Networking
 
 Each thay will VM created will consist of 2 network interfaces - the first is
