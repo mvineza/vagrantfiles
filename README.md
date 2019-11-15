@@ -88,5 +88,10 @@ Python: 3.7.4
 
 Versions on the VMs:
 ```
-TBD
+Boxes:
+  centos/6
+  centos/7
+  iamseth/rhel-7.3
+  ubuntu/trusty64
+  debian/jessie64
 ```
