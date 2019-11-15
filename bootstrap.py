@@ -92,13 +92,16 @@ def cleanup_common_inventory():
     os.chdir(root_path)
     orig = common_inventory
     temp = os.path.join(os.path.dirname(common_inventory), 'inventory_temp')
-    with open(temp, 'w') as f_temp:
-        with open(orig) as f:
-            for line in f:
-                if not re.search(env, line.strip()):
-                    f_temp.write(line)
-    copyfile(temp, orig)
-    os.remove(temp)
+    try:
+        with open(temp, 'w') as f_temp:
+            with open(orig) as f:
+                for line in f:
+                    if not re.search(env, line.strip()):
+                        f_temp.write(line)
+        copyfile(temp, orig)
+        os.remove(temp)
+    except FileNotFoundError:
+        pass
 
 
 def destroy_environment():
