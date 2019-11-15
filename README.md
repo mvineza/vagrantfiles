@@ -37,14 +37,24 @@ connections easy.
 
 ## Tutorials
 
-Creates Vagrantfile but don't bootsrap environment (default)
+Creates Vagrantfile and bootstrap environment:
 ```
-./bootstrap.py -e sample_environment
+./bootstrap.py -e nginx --create
 ```
 
-Creates Vagrantfile and bootsrap environment
+Deletes environment:
 ```
-./bootstrap.py -e sample_environment --create
+./bootstrap.py -e svn_cluster --destroy
+```
+
+Creates 3 VMs:
+```
+./bootstrap.py -e redis_ha_setup -n 3 --create
+```
+
+Creates Vagrantfile but don't bootstrap environment:
+```
+./bootstrap.py -e jenkins --create --render
 ```
 
 Quick look on existing environments
