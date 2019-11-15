@@ -15,6 +15,9 @@ without using any port forwarding. That second interface mimics a real-world
 setup on which the VM is located remotely on the network as if it doesn't
 exist locally inside the host.
 
+The VM hostnames will be in {{ env }}-vm{{ ipv4 address last octet }} for
+easy identification.
+
 ## OS configuration
 
 After creating the VM(s), ansible provisioner will run to copy the host's user
