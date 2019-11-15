@@ -17,6 +17,12 @@ Since environments and common inventory varies in each user, both are added to
 .gitignore. This makes the repo clean by avoiding changes that are not related
 to the code.
 
+## Destroying
+
+When you destroy an environment, the corresponding directories will be deleted,
+the VMs will be removed from host's /etc/hosts as well as from the common
+inventory file.
+
 ## Networking
 
 Each thay will VM created will consist of 2 network interfaces - the first is
