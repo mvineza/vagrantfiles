@@ -24,7 +24,6 @@ Vagrant.configure("2") do |config|
           ansible.extra_vars = {
             env: "{{ env }}"
           }
-          # ansible.raw_arguments = ["--extra-vars={{ env }}"]
         end
       end
     end
