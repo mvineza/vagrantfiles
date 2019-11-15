@@ -54,13 +54,17 @@ ls environments
 
 ## Pre-requisites
 
+```
 Vagrant + vagrant-hostsupdater plugin
 Ansible
 Virtualbox
+```
 
 ## Setup tested
 
+```
 Host OS: MacOS, Ubuntu, Centos, Fedora
 Vagrant: 2.2.5
 Ansible: 2.9.0
 Guest OS: TBD
+```
