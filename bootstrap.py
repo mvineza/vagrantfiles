@@ -6,7 +6,7 @@ import sys
 import subprocess
 from jinja2 import Environment, FileSystemLoader
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
-from shutil import rmtree
+from shutil import rmtree, copyfile
 
 base_env_dir = 'environments'
 template_dir = 'templates'
@@ -88,6 +88,19 @@ def render_template():
                  os.path.join(work_dir, dump_file))
 
 
+def cleanup_common_inventory():
+    os.chdir(root_path)
+    orig = common_inventory
+    temp = os.path.join(os.path.dirname(common_inventory), 'inventory_temp')
+    with open(temp, 'w') as f_temp:
+        with open(orig) as f:
+            for line in f:
+                if not re.search(env, line.strip()):
+                    f_temp.write(line)
+    copyfile(temp, orig)
+    os.remove(temp)
+
+
 def destroy_environment():
     os.chdir(root_path)
     try:
@@ -102,16 +115,7 @@ def destroy_environment():
     else:
         os.chdir(root_path)
         rmtree(work_dir)
-        # inv_orig = common_inventory
-        # inv_temp = os.path.join(os.path.dirname(common_inventory),
-        #                         'inventory_temp')
-        # with open(inv_temp, 'w') as f_temp:
-        #     with open(inv_orig) as f:
-        #         for line in f:
-        #             if line.strip() == env:
-        #                 pass
-        # os.system('copy {} {}'.format(inv_temp, inv_orig))
-        # os.remove(inv_temp)
+        cleanup_common_inventory()
 
 
 def create_environment():
