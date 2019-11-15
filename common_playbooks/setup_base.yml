@@ -58,6 +58,13 @@
     run_once: yes
     lineinfile:
       path: "{{ inventory_file }}"
+      line: "\n[{{ env }}]"
+
+  - name: Populate local inventory
+    delegate_to: localhost
+    run_once: yes
+    lineinfile:
+      path: "{{ inventory_file }}"
       line: "{{ item }}"
     with_items: "{{ groups['all'] }}" 
 

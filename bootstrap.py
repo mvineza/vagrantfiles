@@ -14,6 +14,7 @@ template_file = 'Vagrantfile.j2'
 dump_file = 'Vagrantfile'
 host_file = '/etc/hosts'
 playbooks_dir = 'common_playbooks'
+common_inventory = os.path.join(playbooks_dir, 'inventory')
 root_path = os.path.dirname(os.path.abspath(__file__))
 
 parser = ArgumentParser(description='Setups environment using Vagrant/Ansible',
@@ -83,7 +84,7 @@ def render_template():
                     trim_blocks=True, lstrip_blocks=True)
     t = e.get_template(template_file)
     t.stream(count=count, subnet=subnet, last_host=last_host,
-             box_type=box_type, box_version=box_version).dump(
+             box_type=box_type, box_version=box_version, env=env).dump(
                  os.path.join(work_dir, dump_file))
 
 
@@ -96,11 +97,21 @@ def destroy_environment():
         sys.exit(1)
     destroy_env = subprocess.call([vagrant_cmd, "destroy", "-f"])
     if destroy_env != 0:
-        print('Erorr bootstrapping environment')
+        print('Error destroying environment')
         sys.exit(1)
     else:
-        os.chdir(os.pardir)
-        rmtree(env)
+        os.chdir(root_path)
+        rmtree(work_dir)
+        # inv_orig = common_inventory
+        # inv_temp = os.path.join(os.path.dirname(common_inventory),
+        #                         'inventory_temp')
+        # with open(inv_temp, 'w') as f_temp:
+        #     with open(inv_orig) as f:
+        #         for line in f:
+        #             if line.strip() == env:
+        #                 pass
+        # os.system('copy {} {}'.format(inv_temp, inv_orig))
+        # os.remove(inv_temp)
 
 
 def create_environment():
