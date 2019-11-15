@@ -18,7 +18,8 @@ exist locally inside the host.
 ## OS configuration
 
 After creating the VM(s), ansible provisioner will run to copy the host's user
-SSH public key to the VM so he can connect to the ... TBD
+SSH public key to the VM(s). This alllows passwordless SSH making ansible
+connections easy.
 
 ## Tutorials
 
