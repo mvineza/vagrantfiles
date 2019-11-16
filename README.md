@@ -53,7 +53,7 @@ Creates Vagrantfile but don't bootstrap environment:
 ./bootstrap.py -e jenkins --create --render
 ```
 
-Quick look on existing environments
+Quick look on existing environments:
 ```
 ls environments
 ```
