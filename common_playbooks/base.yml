@@ -53,10 +53,3 @@
     path: "{{ inventory_file }}"
     line: "{{ item }}"
   with_items: "{{ groups['all'] }}" 
-
-# handlers:
-# 
-# - name: restart sshd
-#   service:
-#     name: sshd
-#     state: restarted
