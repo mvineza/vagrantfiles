@@ -11,16 +11,16 @@ by adding another interface on the Vagrantfile, select a subnet, update your
 make sure IPs are not overlapping. Then same for destroying the VMs, you need
 to do such things in reverse to cleanup properly.
 
-This mimics a real-world setup where you have a remote server on your network
-which you can connect to and run ansible provisioning. This is not only
-advantageous for multiple VM setup but also on other cases because this saves
-you time configuring and cleaning up when no longer needed.
-
 This repository contains a python script that uses Vagrant and Ansible to
 bootstrap an environment. It relies on the host's /etc/hosts file to
 determine what is the last VM created. Once determined, it will use the next
 available IP to create any succeeding VMs. The /etc/hosts is updated
 accordingly for every VM created by using the `vagrant-hostsupdater` plugin.
+
+This mimics a real-world setup where you have a remote server on your network
+which you can connect to and run ansible provisioning. This is not only
+advantageous for multiple VM setup but also on other cases because this saves
+you time configuring and cleaning up when no longer needed.
 
 ## Quickstart
 
