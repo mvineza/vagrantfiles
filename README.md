@@ -1,7 +1,7 @@
 ## Introduction
 
 The usual way of bootstrapping a VM is creating a Vagrantfile and executing
-`vagrant up`. But the VM create is very minimilistic. Like for example to
+`vagrant up`. But the VM create is very minimalistic. Like for example to
 connect to it, you need to execute `vagrant ssh` on same directory as the
 Vagrantfile because by default Vagrant connects to SSH via port forwarding.
 But if you like to add another interface on the VM so you can connect to it
