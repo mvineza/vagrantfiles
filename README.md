@@ -1,10 +1,26 @@
 ## Introduction
 
+The usual way of bootstrapping a VM is creating a Vagrantfile and executing
+vagrant up`. But the VM create is very minimilistic. Like for example to
+connect to it, you need to execute `vagrant ssh` on same directory as the
+Vagrantfile because by default Vagrant connects to SSH via port forwarding.
+But if you like to add another interface on the VM so you can connect to it
+via `ssh` in any place of your laptop/PC, you need to do further configurations
+by adding another interface on the Vagrantfile, select a subnet, update your
+/etc/hosts to reflect that IP and on further VMs you will create you need to
+make sure IPs are not overlapping. Then same for destroying the VMs, you need
+to do such things in reverse to cleanup properly.
+
+This mimics a real-world setup where you have a remote server on your network
+which you can connect to and run ansible provisioning. This is not only
+advantageous for multiple VM setup but also on other cases because this saves
+you time configuring and cleaning up when no longer needed.
+
 This repository contains a python script that uses Vagrant and Ansible to
 bootstrap an environment. It relies on the host's /etc/hosts file to
 determine what is the last VM created. Once determined, it will use the next
 available IP to create any succeeding VMs. The /etc/hosts is updated
-accordingly for every vm created by using the `vagrant-hostsupdater` plugin.
+accordingly for every VM created by using the `vagrant-hostsupdater` plugin.
 
 ## Quickstart
 
