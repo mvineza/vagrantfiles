@@ -123,5 +123,6 @@ Boxes:
   centos/7
   iamseth/rhel-7.3
   ubuntu/trusty64
+  ubuntu/xenial64
   debian/jessie64
 ```
