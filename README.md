@@ -23,6 +23,12 @@ which you can connect to and run ansible provisioning. This is not only
 advantageous for multiple VM setup but also on other cases because this saves
 you time configuring and cleaning up when no longer needed.
 
+## Limitations
+
+The default Vagrantfile template will not work on all kinds of boxes. You can
+pass `--render` to the script to only create the Vagrantfile and configure it
+the way you wanted.
+
 ## Quickstart
 
 Creates Vagrantfile and bootstrap environment:
