@@ -12,7 +12,8 @@ make sure IPs are not overlapping. Then same for destroying the VMs, you need
 to do such things in reverse to cleanup properly.
 
 This repository contains a python script that uses Vagrant and Ansible to
-bootstrap an environment. It relies on the host's /etc/hosts file to
+bootstrap an environment. By default it uses `centos/7` box but can be
+configured as command parameter. It relies on the host's /etc/hosts file to
 determine what is the last VM created. Once determined, it will use the next
 available IP to create any succeeding VMs. The /etc/hosts is updated
 accordingly for every VM created by using the `vagrant-hostsupdater` plugin.
