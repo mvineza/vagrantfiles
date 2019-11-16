@@ -53,9 +53,14 @@ Creates Vagrantfile but don't bootstrap environment:
 ./bootstrap.py -e jenkins --create --render
 ```
 
-Quick look on existing environments
+Quick look on existing environments:
 ```
 ls environments
+```
+
+Create a 4GB/2vCPU VM:
+```
+./bootstrap.py -e gitlab -c 2 -m 4096 --create
 ```
 
 ## Bootstrapping
