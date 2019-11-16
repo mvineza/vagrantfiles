@@ -58,6 +58,11 @@ Quick look on existing environments
 ls environments
 ```
 
+Create a 4GB/2vCPU VM:
+```
+./bootstrap.py -e gitlab -c 2 -m 4096 --create
+```
+
 ## Bootstrapping
 
 Each environment will be created under `environment/` directory and a common
