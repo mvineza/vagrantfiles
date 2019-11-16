@@ -1,26 +1,29 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-# Description:
-#   For jenkins sandbox environment (1 master / 1 slave).
 
 Vagrant.configure("2") do |config|
-  N = 2
   home = ENV['HOME']
   virtual_box_path = "#{home}/VirtualBox VMs"
-  (1..N).each do |machine_id|
-    hostname = "jenkins#{machine_id}"
+  (1..{{ count }}).each do |machine_id|
+    hostname = "{{ env }}-vm#{ {{ last_host }}+machine_id }"
     config.vm.define "#{hostname}" do |machine|
       machine.vm.hostname = "#{hostname}"
-      machine.vm.box = "centos/7"
-      machine.vm.network "private_network", ip: "192.168.50.#{15+machine_id}"
+      machine.vm.box = "{{ box_type }}"
+      {% if box_version != 'latest' %}
+      config.vm.box_version = "{{ box_version }}"
+      {% endif %}
+      machine.vm.network "private_network", ip: "{{ subnet }}.#{ {{ last_host }}+machine_id }"
       machine.vm.provider "virtualbox" do |vb|
         vb.name = "#{hostname}"
       end
       # run ansible playbook on all machines when all of them are ready
-      if machine_id == N
+      if machine_id == {{ count }}
         machine.vm.provision :ansible do |ansible|
           ansible.limit = "all"
-          ansible.playbook = "setup_base.yml"
+          ansible.playbook = "common_playbooks/provision.yml"
+          ansible.extra_vars = {
+            env: "{{ env }}"
+          }
         end
       end
     end

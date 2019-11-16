@@ -1,5 +1,0 @@
-# Creating the cluster
-./setup.sh
-
-# destroying the cluster
-vagrant destroy -f
