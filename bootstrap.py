@@ -26,6 +26,8 @@ parser.add_argument('-n', dest='num', default='1', help='number of VMs')
 parser.add_argument('-s', dest='net', default='192.168.50', help='VM subnet')
 parser.add_argument('-b', dest='box', default='centos/7', help='vagrant box')
 parser.add_argument('-v', dest='ver', default='latest', help='box version')
+parser.add_argument('-c', dest='cpu', default='1', help='cpu count')
+parser.add_argument('-m', dest='mem', default='1024', help='memory in MB')
 parser.add_argument('-e', dest='env', required=True,
                     help='name for your environment')
 parser.add_argument('--render', action='store_true',
@@ -37,6 +39,8 @@ env = args.env
 subnet = args.net
 create = args.create
 destroy = args.destroy
+cpu = args.cpu
+mem = args.mem
 box_type = args.box
 box_version = args.ver
 render = args.render
@@ -84,8 +88,8 @@ def render_template():
                     trim_blocks=True, lstrip_blocks=True)
     t = e.get_template(template_file)
     t.stream(count=count, subnet=subnet, last_host=last_host,
-             box_type=box_type, box_version=box_version, env=env).dump(
-                 os.path.join(work_dir, dump_file))
+             box_type=box_type, box_version=box_version, env=env, cpu=cpu,
+             mem=mem).dump(os.path.join(work_dir, dump_file))
 
 
 def cleanup_common_inventory():
