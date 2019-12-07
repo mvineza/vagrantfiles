@@ -1,7 +1,10 @@
 - name: Update /etc/hosts on all nodes
   lineinfile:
     path: /etc/hosts
-    line: "{{ hostvars[item]['ansible_all_ipv4_addresses'][1] }}  {{ hostvars[item]['ansible_hostname'] }}"
+    line: "{% if target_ip | regex_search('192') %}{{ target_ip }}{% else %}{{ fallback_ip }}{% endif %}  {{ hostvars[item]['ansible_hostname'] }}"
+  vars:
+    target_ip: "{{ hostvars[item]['ansible_all_ipv4_addresses'][1] }}"
+    fallback_ip: "{{ hostvars[item]['ansible_all_ipv4_addresses'][0] }}"
   with_items: "{{ groups['all'] }}"
 
 - name: Allow password authentication
