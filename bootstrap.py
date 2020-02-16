@@ -63,7 +63,7 @@ def get_last_ip():
         for line in f.readlines():
             ip_list.extend(re.findall(subnet + '.[0-9]+', line.strip()))
     try:
-        last_ip = sorted(ip_list)[-1:][0]
+        last_ip = sorted(ip_list, key=lambda x: int(x.split('.')[3]))[-1:][0]
         last_host = last_ip.split('.')[-1:][0]
     except IndexError:
         last_host = '1'
