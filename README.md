@@ -63,6 +63,11 @@ Create a 4GB/2vCPU VM:
 ./bootstrap.py -e gitlab -c 2 -m 4096 --create
 ```
 
+Rebuilding an existing environment (uses existing IP and hostname upon creation):
+```
+./bootstrap.py -e postgresql --rebuild
+```
+
 ## Bootstrapping
 
 Each environment will be created under `environment/` directory and a common
