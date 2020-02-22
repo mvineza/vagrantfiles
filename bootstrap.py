@@ -22,6 +22,7 @@ parser = ArgumentParser(description='Setups environment using Vagrant/Ansible',
 group = parser.add_mutually_exclusive_group()
 group.add_argument('--create', action='store_true', help='create env')
 group.add_argument('--destroy', action='store_true', help='destroy env')
+group.add_argument('--rebuild', action='store_true', help='rebuild env')
 parser.add_argument('-n', dest='num', default='1', help='number of VMs')
 parser.add_argument('-s', dest='net', default='192.168.50', help='VM subnet')
 parser.add_argument('-b', dest='box', default='centos/7', help='vagrant box')
@@ -39,6 +40,7 @@ env = args.env
 subnet = args.net
 create = args.create
 destroy = args.destroy
+rebuild = args.rebuild
 cpu = args.cpu
 mem = args.mem
 box_type = args.box
@@ -138,6 +140,20 @@ def create_environment():
             sys.exit(1)
 
 
+def rebuild_environment():
+    try:
+        os.chdir(work_dir)
+    except FileNotFoundError:
+        print('Unable to find environment. Create it first using --create')
+        sys.exit(1)
+    destroy_env = subprocess.call([vagrant_cmd, "destroy", "-f"])
+    create_env = subprocess.call([vagrant_cmd, "up"])
+    if create_env != 0 or destroy_env != 0:
+        print('Error rebuilding environment')
+        destroy_environment()
+        sys.exit(1)
+
+
 def check_requirements():
     global vagrant_cmd
     vagrant_cmd = get_vagrant_cmd()
@@ -155,3 +171,5 @@ if create:
     create_environment()
 if destroy:
     destroy_environment()
+if rebuild:
+    rebuild_environment()
