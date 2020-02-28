@@ -116,7 +116,7 @@ Virtualbox
 Version combintations on the host:
 ```
 Mac:
- a.) Vbox 6.0.14 r133895 (QT5.6.3) / Vagrant 2.2.5 / Ansible 2.9.0 / Python 3.7.5
+ a.) Vbox 6.0.14 r133895 (QT5.6.3) / Vagrant 2.2.5 / Ansible 2.9.0 / Python 3.7.5 / vagrant-hostsupdater 1.1.1.160
 ```
 
 Versions on the VMs:
