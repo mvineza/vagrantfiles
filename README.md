@@ -119,6 +119,8 @@ OS: MacOS, Ubuntu, Centos, Fedora
 Vagrant: 2.2.5
 Ansible: 2.9.0
 Python: 3.7.4
+Virtualbox:
+  Mac: 6.0.14 r133895 (QT5.6.3)
 ```
 
 Versions on the VMs:
