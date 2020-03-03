@@ -3,6 +3,7 @@
   vars:
     remote_ssh_user: "{{ lookup('env', 'USER') }}"
     inventory_file: inventory
+    time_zone: Asia/Singapore
   tasks:
 
   - name: (RedHat|CentOS) Install dependencies
