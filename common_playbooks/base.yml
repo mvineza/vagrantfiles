@@ -56,3 +56,7 @@
     path: "{{ inventory_file }}"
     line: "{{ item }}"
   with_items: "{{ groups['all'] }}" 
+
+- name: Set timezone
+  timezone:
+    name: "{{ time_zone }}"
